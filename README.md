@@ -32,6 +32,12 @@ cmake ..
 make
 ```
 
+> *Optional* way to compile the project (without CMake)
+> This project can be compiled using the following command (but we'll still be using CMake instead).
+> ```bash
+> g++ game.cpp ../external/glad/src/glad.c -I../external/glad/include -lglfw -ldl -lGL -std=c++20 -o app
+> ```
+
 ### Run
 ```bash
 ./mycraft++
