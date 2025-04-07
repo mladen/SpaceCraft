@@ -15,15 +15,12 @@ const float PI = 3.14159265359f;
 
 int main()
 {
-    glfwInit(); // Initializes GLFW
-
-    // Tells GLFW what version of OpenGL to use. In this case we're using OpenGL 3.3
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // Sets the major version of the OpenGL context to 3
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // Sets the minor version of the OpenGL context to 3
-
-    // Tells GLFW that we're using the core profile of OpenGL
-    // That means we only have access to modern functions
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Use the core profile of OpenGL
+    // Initialize GLFW
+    if (!glfwInit())
+    {
+        std::cout << "Failed to initialize GLFW" << std::endl;
+        return -1;
+    }
 
     // Create a GLFW window with the specified dimensions and title
     GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "Spacecraft", NULL, NULL);
@@ -39,11 +36,13 @@ int main()
     // Introduces the window into the current context, which means it becomes the current OpenGL context
     glfwMakeContextCurrent(window);
 
-    // if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    // {
-    //     std::cout << "Failed to initialize GLAD" << std::endl;
-    //     return -1;
-    // }
+    // Initialize GLAD
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        glfwTerminate();
+        return -1;
+    }
 
     gladLoadGL();                             // Initializes/loads GLAD (a library for loading OpenGL function pointers) so it configures the OpenGL context
     glViewport(0, 0, WIDTH, HEIGHT);          // Sets the viewport to cover the entire window
@@ -53,6 +52,13 @@ int main()
 
     while (!glfwWindowShouldClose(window))
     {
+
+        // Rendering commands
+        glClearColor(0.072f, 0.13f, 0.17f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        // Swap buffers and poll events
+        glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
