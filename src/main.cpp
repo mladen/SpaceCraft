@@ -31,6 +31,18 @@ int main()
 
     glfwMakeContextCurrent(window);
 
+    // if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    // {
+    //     std::cout << "Failed to initialize GLAD" << std::endl;
+    //     return -1;
+    // }
+
+    gladLoadGL(); // Initialize GLAD (a library for loading OpenGL function pointers)
+    glViewport(0, 0, WIDTH, HEIGHT);
+    glClearColor(0.072f, 0.13f, 0.17f, 1.0f); // Set the clear color to a dark blue
+    glClear(GL_COLOR_BUFFER_BIT);             // Clear the color buffer
+    glfwSwapBuffers(window);                  // Swap the front and back buffers
+
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
