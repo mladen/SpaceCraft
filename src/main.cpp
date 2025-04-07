@@ -22,6 +22,15 @@ int main()
         return -1;
     }
 
+    // Configure GLFW
+    // Tells GLFW what version of OpenGL to use. In this case we're using OpenGL 3.3
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // Sets the major version of the OpenGL context to 3
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // Sets the minor version of the OpenGL context to 3
+
+    // Tells GLFW that we're using the core profile of OpenGL
+    // That means we only have access to modern functions
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Use the core profile of OpenGL
+
     // Create a GLFW window with the specified dimensions and title
     GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "Spacecraft", NULL, NULL);
 
