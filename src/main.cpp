@@ -14,6 +14,7 @@ const int NUM_SEGMENTS = 100;
 const float PI = 3.14159265359f;
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
+void processInput(GLFWwindow *window);
 
 int main()
 {
@@ -58,8 +59,11 @@ int main()
     glViewport(0, 0, WIDTH, HEIGHT); // Sets the viewport to cover the entire window
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+    // Main loop
     while (!glfwWindowShouldClose(window))
     {
+        // Process input
+        processInput(window);
 
         // Rendering commands
         glClearColor(0.072f, 0.13f, 0.17f, 1.0f);
@@ -82,3 +86,8 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
+void processInput(GLFWwindow *window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+}
