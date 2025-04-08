@@ -70,8 +70,8 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Swap buffers and poll events
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        glfwSwapBuffers(window); // Swaps the front and back buffers
+        glfwPollEvents();        // Polls for and processes events
     }
 
     // Clean up
