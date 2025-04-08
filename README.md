@@ -1,4 +1,6 @@
-## Installation
+# A simple Minecraft clone, but in space (eventually), done in C++17 using OpenGL
+
+## 1. Installation
 
 ### Install GLEW (for OpenGL extensions)
 ```bash
@@ -24,7 +26,7 @@ sudo apt install libgl1-mesa-dev
 # or sudo apt-get install libgl1-mesa-dev
 ```
 
-### Build
+### 2. Build
 ```bash
 mkdir build
 cd build
@@ -38,7 +40,7 @@ make
 > g++ game.cpp ../external/glad/src/glad.c -I../external/glad/include -lglfw -ldl -lGL -std=c++20 -o app
 > ```
 
-### Run
+### 3. Run
 ```bash
-./mycraft++
+./SpaceCraft
 ```
