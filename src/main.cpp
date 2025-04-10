@@ -116,6 +116,20 @@ int main()
                   << infoLog << std::endl;
     }
 
+    // 3. Create and link shader program (a combination of vertex and fragment shaders)
+    unsigned int shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+
+    // Check for linking errors
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if (!success)
+    {
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
+                  << infoLog << std::endl;
+    }
 
     // Main loop
     while (!glfwWindowShouldClose(window))
