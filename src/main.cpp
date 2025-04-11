@@ -127,6 +127,11 @@ int main()
                   << infoLog << std::endl;
     }
 
+    // 4. Delete shader objects
+    // We don't need the shader objects anymore, because we've linked them into the shader program
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
     // Main loop
     while (!glfwWindowShouldClose(window))
     {
