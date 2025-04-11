@@ -116,7 +116,7 @@ int main()
     unsigned int shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
+    glLinkProgram(shaderProgram); // The final, linked version of multiple shaders combined, is called a "shader program object".
 
     // Check for linking errors
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
