@@ -51,17 +51,16 @@ int main()
 
     // Create a GLFW window with the specified dimensions and title
     GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "Spacecraft", NULL, NULL);
-
-    // Checks if the window was successfully created
-    if (window == NULL)
+    if (window == NULL) // Checks if the window was successfully created
     {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
     }
 
-    // Introduces the window into the current context, which means it becomes the current OpenGL context
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(window);                                    // Introduces the window into the current context, which means it becomes the current OpenGL context
+    glViewport(0, 0, WIDTH, HEIGHT);                                   // Sets the viewport to cover the entire window
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // Sets the callback function for when the window is resized
 
     // Initialize GLAD
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -70,9 +69,6 @@ int main()
         glfwTerminate();
         return -1;
     }
-
-    glViewport(0, 0, WIDTH, HEIGHT); // Sets the viewport to cover the entire window
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     // Vertex data
     float vertices[] = {
