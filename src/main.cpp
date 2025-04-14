@@ -76,11 +76,16 @@ int main()
         0.5f, -0.5f, 0.0f,
         0.0f, 0.5f, 0.0f};
 
-    // Crate and bind Vertex Buffer Object
+    // Crate and bind Vertex BUFFER Object
     unsigned int VBO;
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // Create and bind Vertex ARRAY Object (which store vertex attribute configuration and uses the VBO)
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
 
     // 1. Create and compile VERTEX shader
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
