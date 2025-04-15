@@ -86,10 +86,9 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    // Create and bind Vertex ARRAY Object (which store vertex attribute configuration and uses the VBO)
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
+    // Setup vertex attribute pointer
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+    glEnableVertexAttribArray(0);
 
     // 1. Create and compile VERTEX shader
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -148,8 +147,13 @@ int main()
         processInput(window);
 
         // Rendering commands
-        glClearColor(0.072f, 0.13f, 0.17f, 1.0f);
+        // glClearColor(0.072f, 0.13f, 0.17f, 1.0f);
+        glClearColor(0.0f, 0.875f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        // Use shader program
+        glUseProgram(shaderProgram); // Every shader and rendering call after glUseProgram will
+                                     // now use this program object (and thus the shaders).
 
         // Draw triangle
         glBindVertexArray(VAO); // Binding the VAO is not necessary, but it's a good practice
