@@ -13,8 +13,8 @@ const float RADIUS = 0.5f;
 const int NUM_SEGMENTS = 100;
 const float PI = 3.14159265359f;
 
-void framebuffer_size_callback(GLFWwindow *window, int width, int height);
-void processInput(GLFWwindow *window);
+void framebuffer_size_callback(GLFWwindow *window, int width, int height); // Callback function for window resize
+void processInput(GLFWwindow *window);                                     // Callback function for keyboard input
 
 // Vertex shader source
 const char *vertexShaderSource = "#version 330 core\n"
@@ -59,10 +59,9 @@ int main()
     }
 
     glfwMakeContextCurrent(window);                                    // Introduces the window into the current context, which means it becomes the current OpenGL context
-    glViewport(0, 0, WIDTH, HEIGHT);                                   // Sets the viewport to cover the entire window
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // Sets the callback function for when the window is resized
 
-    // Initialize GLAD
+    // Initialize GLAD, which handles the OpenGL function pointers
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
@@ -161,7 +160,9 @@ int main()
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
-    glViewport(0, 0, width, height);
+    glViewport(0, 0, width, height); // Sets the viewport to cover the entire window;
+                                     // It does it initially when the window is created
+                                     // and whenever the window is resized!
 }
 
 void processInput(GLFWwindow *window)
