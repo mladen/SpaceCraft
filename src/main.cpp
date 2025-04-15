@@ -75,6 +75,11 @@ int main()
         0.5f, -0.5f, 0.0f,
         0.0f, 0.5f, 0.0f};
 
+    // Create and bind Vertex ARRAY Object (which store vertex attribute configuration and uses the VBO)
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
     // Crate and bind Vertex BUFFER Object
     unsigned int VBO;
     glGenBuffers(1, &VBO);
@@ -146,12 +151,19 @@ int main()
         glClearColor(0.072f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        // Draw triangle
+        glBindVertexArray(VAO); // Binding the VAO is not necessary, but it's a good practice
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
         // Swap buffers and poll events
         glfwSwapBuffers(window); // Swaps the front and back buffers
         glfwPollEvents();        // Polls for and processes events
     }
 
     // Clean up
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteProgram(shaderProgram);
     glfwDestroyWindow(window);
     glfwTerminate();
 
