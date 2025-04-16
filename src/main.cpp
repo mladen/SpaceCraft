@@ -168,7 +168,7 @@ int main()
         glUseProgram(shaderProgram); // Every shader and rendering call after glUseProgram will
         // now use this program object (and thus the shaders).
 
-        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // GL_LINE, GL_FILL
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // GL_LINE, GL_FILL
 
         // Draw triangle
         glBindVertexArray(VAO); // Binding the VAO is not necessary, but it's a good practice
