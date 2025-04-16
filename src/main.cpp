@@ -69,11 +69,18 @@ int main()
         return -1;
     }
 
-    // Vertex data
+    // Set up vertex data (and buffer(s)) and configure vertex attributes
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f, 0.5f, 0.0f};
+        0.5f, 0.5f, 0.0f,   // top right
+        0.5f, -0.5f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f, // bottom left
+        -0.5f, 0.5f, 0.0f   // top left
+    };
+    unsigned int indices[] = {
+        // note that we start from 0!
+        0, 1, 3, // first triangle
+        1, 2, 3  // second triangle
+    };
 
     // Create and bind Vertex ARRAY Object (which store vertex attribute configuration and uses the VBO)
     unsigned int VAO;
@@ -81,10 +88,16 @@ int main()
     glBindVertexArray(VAO);
 
     // Crate and bind Vertex BUFFER Object
-    unsigned int VBO;
+    unsigned int VBO; // Stores vertex data in GPU memory
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // Create and bind Element BUFFER Object
+    unsigned int EBO; // Stores index data in GPU memory
+    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // Setup vertex attribute pointer
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
@@ -153,11 +166,14 @@ int main()
 
         // Use shader program
         glUseProgram(shaderProgram); // Every shader and rendering call after glUseProgram will
-                                     // now use this program object (and thus the shaders).
+        // now use this program object (and thus the shaders).
+
+        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // GL_LINE, GL_FILL
 
         // Draw triangle
         glBindVertexArray(VAO); // Binding the VAO is not necessary, but it's a good practice
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
         // Swap buffers and poll events
         glfwSwapBuffers(window); // Swaps the front and back buffers
