@@ -168,12 +168,11 @@ int main()
         glUseProgram(shaderProgram); // Every shader and rendering call after glUseProgram will
         // now use this program object (and thus the shaders).
 
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // GL_LINE, GL_FILL
+        // Set the polygon mode which draws a wireframe
+        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // GL_LINE, GL_FILL
 
-        // Draw triangle
-        glBindVertexArray(VAO); // Binding the VAO is not necessary, but it's a good practice
+        // Draw rectangle
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
         // Swap buffers and poll events
         glfwSwapBuffers(window); // Swaps the front and back buffers
