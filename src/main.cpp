@@ -36,7 +36,7 @@ int main()
     // Initialize GLFW
     if (!glfwInit())
     {
-        std::cout << "Failed to initialize GLFW" << std::endl;
+        std::cerr << "Failed to initialize GLFW" << std::endl;
         return -1;
     }
 
@@ -51,9 +51,9 @@ int main()
 
     // Create a GLFW window with the specified dimensions and title
     GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "Spacecraft", NULL, NULL);
-    if (window == NULL) // Checks if the window was successfully created
+    if (!window) // Checks if the window was successfully created
     {
-        std::cout << "Failed to create GLFW window" << std::endl;
+        std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
     }
@@ -64,7 +64,7 @@ int main()
     // Initialize GLAD, which handles the OpenGL function pointers
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        std::cout << "Failed to initialize GLAD" << std::endl;
+        std::cerr << "Failed to initialize GLAD" << std::endl;
         glfwTerminate();
         return -1;
     }
@@ -76,8 +76,8 @@ int main()
         -0.5f, -0.5f, 0.0f, // bottom left
         -0.5f, 0.5f, 0.0f   // top left
     };
+
     unsigned int indices[] = {
-        // note that we start from 0!
         0, 1, 3, // first triangle
         1, 2, 3  // second triangle
     };
