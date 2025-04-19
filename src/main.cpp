@@ -105,6 +105,14 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0); // Enable the vertex attribute
 
+    // Note that this is allowed, the call to glVertexAttribPointer registered VBO as
+    // the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
+    glBindBuffer(GL_ARRAY_BUFFER, 0); // This is optional, but it's a good practice to unbind any buffers to prevent bugs
+
+    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens
+    glBindVertexArray(0);
+
+
     // Main loop
     while (!glfwWindowShouldClose(window))
     {
