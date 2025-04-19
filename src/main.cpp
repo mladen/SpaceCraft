@@ -82,20 +82,18 @@ int main()
         1, 2, 3  // second triangle
     };
 
-    // Create and bind Vertex ARRAY Object (which store vertex attribute configuration and uses the VBO)
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO);
+    // Generate and configure buffers
+    unsigned int VAO, VBO, EBO;
+    glGenVertexArrays(1, &VAO); // VAO = Vertex Array Object; stores the state of the vertex attribute configuration and uses it when rendering
+    glGenBuffers(1, &VBO);      // VBO = Vertex Buffer Object; stores the vertex data
+    glGenBuffers(1, &EBO);      // EBO = Element Buffer Object; stores the index data
+
+    // Bind VAO first, then bind and set VBO(s) and EBO, then configure vertex attributes
     glBindVertexArray(VAO);
 
-    // Crate and bind Vertex BUFFER Object
-    unsigned int VBO; // Stores vertex data in GPU memory
-    glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    // Create and bind Element BUFFER Object
-    unsigned int EBO; // Stores index data in GPU memory
-    glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
