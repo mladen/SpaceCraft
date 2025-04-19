@@ -15,8 +15,10 @@ const float PI = 3.14159265359f;
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height); // Callback function for window resize
 void processInput(GLFWwindow *window);                                     // Callback function for keyboard input
+unsigned int compileShader(unsigned int type, const char *source);
+unsigned int createShaderProgram(const char *vertexShaderSource, const char *fragmentShaderSource);
 
-// Vertex shader source
+// Shader sources
 const char *vertexShaderSource = "#version 330 core\n"
                                  "layout (location = 0) in vec3 aPos;\n"
                                  "void main()\n"
@@ -112,6 +114,8 @@ int main()
     // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens
     glBindVertexArray(0);
 
+    // Create and compile shader program
+    unsigned int shaderProgram = createShaderProgram(vertexShaderSource, fragmentShaderSource);
 
     // Main loop
     while (!glfwWindowShouldClose(window))
@@ -119,30 +123,28 @@ int main()
         // Process input
         processInput(window);
 
-        // Rendering commands
+        // Rendering
         // glClearColor(0.072f, 0.13f, 0.17f, 1.0f);
         glClearColor(0.0f, 0.875f, 1.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        // Use shader program
-        glUseProgram(shaderProgram); // Every shader and rendering call after glUseProgram will
-        // now use this program object (and thus the shaders).
-
-        // Set the polygon mode which draws a wireframe
-        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // GL_LINE, GL_FILL
+        glClear(GL_COLOR_BUFFER_BIT); // Clear the color buffer
 
         // Draw rectangle
+        glUseProgram(shaderProgram);
+        glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        // glBindVertexArray(0); // No need to unbind every time
 
         // Swap buffers and poll events
         glfwSwapBuffers(window); // Swaps the front and back buffers
         glfwPollEvents();        // Polls for and processes events
     }
 
-    // Clean up
+    // Clean up resources
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
     glDeleteProgram(shaderProgram);
+
     glfwDestroyWindow(window);
     glfwTerminate();
 
@@ -160,4 +162,56 @@ void processInput(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+}
+
+unsigned int compileShader(unsigned int type, const char *source)
+{
+    // Create shader
+    unsigned int shader = glCreateShader(type);
+    glShaderSource(shader, 1, &source, NULL);
+    glCompileShader(shader);
+
+    // Check for shader compilation errors
+    int success;
+    char infoLog[512];
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(shader, 512, NULL, infoLog);
+        std::cerr << "ERROR::SHADER::" << (type == GL_VERTEX_SHADER ? "VERTEX" : "FRAGMENT")
+                  << "::COMPILATION_FAILED\n"
+                  << infoLog << std::endl;
+    }
+
+    return shader;
+}
+
+unsigned int createShaderProgram(const char *vertexShaderSource, const char *fragmentShaderSource)
+{
+    // Compile shaders
+    unsigned int vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderSource);
+    unsigned int fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
+
+    // Create shader program
+    unsigned int program = glCreateProgram();
+    glAttachShader(program, vertexShader);
+    glAttachShader(program, fragmentShader);
+    glLinkProgram(program);
+
+    // Check for linking errors
+    int success;
+    char infoLog[512];
+    glGetProgramiv(program, GL_LINK_STATUS, &success);
+    if (!success)
+    {
+        glGetProgramInfoLog(program, 512, NULL, infoLog);
+        std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
+                  << infoLog << std::endl;
+    }
+
+    // Delete shaders as they're linked into the program and no longer necessary
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
+    return program;
 }
