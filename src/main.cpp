@@ -76,13 +76,16 @@ int main()
         0.5f, 0.5f, 0.0f,   // top right
         0.5f, -0.5f, 0.0f,  // bottom right
         -0.5f, -0.5f, 0.0f, // bottom left
-        -0.5f, 0.5f, 0.0f   // top left
-    };
+        -0.5f, 0.5f, 0.0f,  // top left
+        0.6f, 0.6f, 0.0f,
+        0.6f, -0.6f, 0.0f,
+        0.9f, 0.0f, 0.0f};
 
+    // Set up index data; This is used to specify which vertices make up each triangle
     unsigned int indices[] = {
         0, 1, 3, // first triangle
-        1, 2, 3  // second triangle
-    };
+        // 1, 2, 3, // second triangle
+        4, 5, 6};
 
     // Generate and configure buffers
     unsigned int VAO, VBO, EBO;
