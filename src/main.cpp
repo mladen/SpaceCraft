@@ -83,9 +83,9 @@ int main()
 
     // Set up index data; This is used to specify which vertices make up each triangle
     unsigned int indices[] = {
-        0, 1, 3, // first triangle
-        // 1, 2, 3, // second triangle
-        4, 5, 6};
+        0, 1, 3,  // first triangle
+        1, 2, 3,  // second triangle
+        4, 5, 6}; // third triangle
 
     // Generate and configure buffers
     unsigned int VAO, VBO, EBO;
@@ -134,7 +134,7 @@ int main()
         // Draw rectangle
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0); // 9 means 3 triangles because each triangle has 3 vertices
         // glBindVertexArray(0); // No need to unbind every time
 
         // Swap buffers and poll events
