@@ -73,28 +73,21 @@ int main()
 
     // Set up vertex data (and buffer(s)) and configure vertex attributes
     float vertices[] = {
-        // Triangle 1
-        0.5f,
-        0.5f,
-        0.0f, // top right
-        -0.5f,
-        0.5f,
-        0.0f, // top left
-        -0.5f,
-        -0.5f,
-        0.0f, // bottom left
-        // Triangle 2
-        // 0.0f, 0.0f, 0.0f,
-        0.5f,
-        -0.5f,
-        0.0f, // bottom right
-        // 0.5f, 0.0f, 0.0f
+        // first triangle
+        -0.9f, 0.5f, 0.0f,   // left
+        -0.0f, 0.5f, 0.0f,   // right
+        -0.45f, -0.5f, 0.0f, // top
+
+        // second triangle
+        0.0f, -0.5f, 0.0f, // left
+        0.9f, -0.5f, 0.0f, // right
+        0.45f, 0.5f, 0.0f  // top
     };
 
     // Set up index data; This is used to specify which vertices make up each triangle
-    unsigned int indices[] = {
-        0, 1, 2,  // first triangle; an indice of 0 refers to the first vertex (triplet of coordinates - (0.5, 0.5, 0.0) in our case)
-        0, 2, 3}; // second triangle
+    // unsigned int indices[] = {
+    //     0, 1, 2,  // first triangle; an indice of 0 refers to the first vertex (triplet of coordinates - (0.5, 0.5, 0.0) in our case)
+    //     0, 2, 3}; // second triangle
 
     // Generate and configure buffers
     unsigned int VAO,
@@ -110,7 +103,7 @@ int main()
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // Position attribute which is used in the vertex shader to position the vertices
     // The last parameter (GL_FALSE) tells OpenGL that the data is not normalized, meaning that it should stay between 0 and 1
@@ -144,7 +137,8 @@ int main()
         // Draw rectangle
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0); // 9 means 3 triangles because each triangle has 3 vertices
+        glDrawArrays(GL_TRIANGLES, 0, 6); // set the count to 6 since we're drawing 6 vertices now (2 triangles); not 3!
+        // glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0); // 9 means 3 triangles because each triangle has 3 vertices
         // glBindVertexArray(0); // No need to unbind every time
 
         // Swap buffers and poll events
