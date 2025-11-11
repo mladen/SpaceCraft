@@ -13,10 +13,10 @@ const float RADIUS = 0.5f;
 const int NUM_SEGMENTS = 100;
 const float PI = 3.14159265359f;
 
-void framebuffer_size_callback(GLFWwindow *window, int width, int height); // Callback function for window resize
-void processInput(GLFWwindow *window);                                     // Callback function for keyboard input
-unsigned int compileShader(unsigned int type, const char *source);
-unsigned int createShaderProgram(const char *vertexShaderSource, const char *fragmentShaderSource);
+void framebuffer_size_callback(GLFWwindow *window, int width, int height);                          // Callback function for window resize
+void processInput(GLFWwindow *window);                                                              // Callback function for keyboard input
+unsigned int compileShader(unsigned int type, const char *source);                                  // Function to compile a shader
+unsigned int createShaderProgram(const char *vertexShaderSource, const char *fragmentShaderSource); // Function to create a shader program
 
 // Shader sources
 const char *vertexShaderSource = "#version 330 core\n"
@@ -83,12 +83,11 @@ int main()
         -0.5f,
         -0.5f,
         0.0f, // bottom left
-
         // Triangle 2
         // 0.0f, 0.0f, 0.0f,
         0.5f,
         -0.5f,
-        0.0f,
+        0.0f, // bottom right
         // 0.5f, 0.0f, 0.0f
     };
 
@@ -200,6 +199,7 @@ unsigned int compileShader(unsigned int type, const char *source)
     return shader;
 }
 
+// Create and compile shader program
 unsigned int createShaderProgram(const char *vertexShaderSource, const char *fragmentShaderSource)
 {
     // Compile shaders

@@ -1,4 +1,4 @@
-# A simple Minecraft clone, but in space (eventually), done in C++20 using OpenGL
+# A simple Minecraft clone, but in space (eventually), done in C++20 and OpenGL
 
 ![Current status](readme_images/spacecraft_screenshot4.png "Current SpaceCraft game screenshot")
 
