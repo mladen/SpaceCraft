@@ -1,6 +1,6 @@
 # A simple Minecraft clone, but in space (eventually), done in C++20 and OpenGL
 
-![Current status](readme_images/spacecraft_screenshot5.png "Current SpaceCraft game screenshot")
+![Current status](readme_images/spacecraft_screenshot.png "Current SpaceCraft game screenshot")
 
 ## 1. Installation
 
