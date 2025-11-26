@@ -21,23 +21,20 @@ unsigned int createShaderProgram(const char *vertexShaderSource, const char *fra
 // Shader sources
 const char *vertexShaderSource = "#version 330 core\n"
                                  "layout (location = 0) in vec3 aPos;\n"
+                                 "out vec4 vertexColor;\n"
                                  "void main()\n"
                                  "{\n"
-                                 "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-                                 "}\0";
+                                 "  gl_Position = vec4(aPos, 1.0);\n"
+                                 "  vertexColor = vec4(1.0f, 0.5f, 0.0f, 1.0f);\n"
+                                 "}\n";
 
-const char *fragmentShader1Source = "#version 330 core\n"
-                                    "out vec4 FragColor;\n"
-                                    "void main()\n"
-                                    "{\n"
-                                    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-                                    "}\n\0";
-const char *fragmentShader2Source = "#version 330 core\n"
-                                    "out vec4 FragColor;\n"
-                                    "void main()\n"
-                                    "{\n"
-                                    "   FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
-                                    "}\n\0";
+const char *fragmentShaderSource = "#version 330 core\n"
+                                   "out vec4 FragColor;\n"
+                                   "in vec4 vertexColor;\n"
+                                   "void main()\n"
+                                   "{\n"
+                                   "  FragColor = vertexColor;\n"
+                                   "}\n";
 
 int main()
 {
@@ -150,7 +147,6 @@ int main()
         glBindVertexArray(VAOs[0]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         // ...then we draw the SECOND triangle using the data from the second(!) VAO
-        glUseProgram(shaderProgramYellow);
         glBindVertexArray(VAOs[1]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -163,7 +159,6 @@ int main()
     glDeleteVertexArrays(2, VAOs);
     glDeleteBuffers(2, VBOs);
     glDeleteProgram(shaderProgramOrange);
-    glDeleteProgram(shaderProgramYellow);
 
     glfwDestroyWindow(window);
     glfwTerminate();
