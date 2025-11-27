@@ -112,7 +112,8 @@ int main()
     glBufferData(GL_ARRAY_BUFFER, sizeof(secondTriangle), secondTriangle, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0); // because the vertex data is tightly packed we can also specify 0 as the vertex attribute's stride to let OpenGL figure it out
-    // glEnableVertexAttribArray(0);
+    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+    glEnableVertexAttribArray(0);
 
     // Note that this is allowed, the call to glVertexAttribPointer registered VBO as
     // the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
@@ -137,10 +138,12 @@ int main()
         // myShader.setFloat("offset", 1.0f);
 
         // Draw FIRST triangle using the data from the first VAO...
+        myShader.setBool("useUniformColor", false);
         glBindVertexArray(VAOs[0]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // ...then we draw the SECOND triangle using the data from the second(!) VAO
+        myShader.setBool("useUniformColor", true);
         glUniform3f(glGetUniformLocation(myShader.ID, "uColor"), 0.0f, 1.0f, 0.0f); // green
         glBindVertexArray(VAOs[1]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
