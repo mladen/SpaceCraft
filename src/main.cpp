@@ -38,6 +38,13 @@ const char *fragmentShaderSource = "#version 330 core\n"
                                    "  FragColor = myCustomColor;\n"
                                    "}\n";
 
+const char *fragmentShaderSourceFixed = "#version 330 core\n"
+                                        "out vec4 FragColor;\n"
+                                        "void main()\n"
+                                        "{\n"
+                                        "   FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
+                                        "}\n\0";
+
 int main()
 {
     // Initialize GLFW
@@ -131,7 +138,7 @@ int main()
 
     // Build and compile our shader program
     unsigned int shaderProgram = createShaderProgram(vertexShaderSource, fragmentShaderSource);
-    // unsigned int shaderProgramYellow = createShaderProgram(vertexShaderSource, fragmentShader2Source);
+    unsigned int shaderProgramFixed = createShaderProgram(vertexShaderSource, fragmentShaderSourceFixed);
 
     // Main loop
     while (!glfwWindowShouldClose(window))
@@ -157,6 +164,7 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // ...then we draw the SECOND triangle using the data from the second(!) VAO
+        glUseProgram(shaderProgramFixed); // Use the fixed color shader program (Without this, the second triangle would also get the color from the first shader - changing green over time)
         glBindVertexArray(VAOs[1]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
