@@ -20,22 +20,25 @@ unsigned int createShaderProgram(const char *vertexShaderSource, const char *fra
 
 // Shader sources
 const char *vertexShaderSource = "#version 330 core\n"
-                                 "layout (location = 0) in vec3 aPos;\n"
-                                 "out vec4 vertexColor;\n"
+                                 "layout (location = 0) in vec3 aPos;\n"   // the position variable has attribute position 0
+                                 "layout (location = 1) in vec3 aColor;\n" // the color variable has attribute position 1
+                                 "\n"
+                                 "out vec3 myCustomColor;\n" // output a color to the fragment shader
+                                 "\n"
                                  "void main()\n"
                                  "{\n"
                                  "  gl_Position = vec4(aPos, 1.0);\n"
-                                 "  vertexColor = vec4(1.0f, 0.5f, 0.0f, 1.0f);\n"
+                                 "  myCustomColor = aColor;\n" // set myCustomColor to the input color we got from the vertex data
                                  "}\n";
 
 const char *fragmentShaderSource = "#version 330 core\n"
                                    "out vec4 FragColor;\n"
                                    "\n"
-                                   "uniform vec4 myCustomColor;\n"
+                                   "in vec3 myCustomColor;\n"
                                    "\n"
                                    "void main()\n"
                                    "{\n"
-                                   "  FragColor = myCustomColor;\n"
+                                   "  FragColor = vec4(myCustomColor, 1.0);\n"
                                    "}\n";
 
 const char *fragmentShaderSourceFixed = "#version 330 core\n"
@@ -84,21 +87,16 @@ int main()
     }
 
     // Set up vertex data (and buffer(s)) and configure vertex attributes
-    float firstTriangle[] = {
-        // first triangle
-        -0.9f,
-        0.5f,
-        0.0f, // left
-        -0.0f,
-        0.5f,
-        0.0f, // right
-        -0.45f,
-        -0.5f,
-        0.0f, // bottom
+    float firstTrianglesVertices[] = {
+        // First triangle
+        // Positions (first 3 values) // Colors (last 3 values)
+        -0.9f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f,  // left
+        -0.0f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f,  // right
+        -0.45f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f // bottom
     };
 
     float secondTriangle[] = {
-        // second triangle
+        // Second triangle
         0.0f, -0.5f, 0.0f, // left
         0.9f, -0.5f, 0.0f, // right
         0.45f, 0.5f, 0.0f  // top
@@ -116,15 +114,27 @@ int main()
     // FIRST TRIANGLE SETUP
     glBindVertexArray(VAOs[0]);
     glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(firstTriangle), firstTriangle, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0); // Vertex attributes stay the same
+    glBufferData(GL_ARRAY_BUFFER, sizeof(firstTrianglesVertices), firstTrianglesVertices, GL_STATIC_DRAW);
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0); // Vertex attributes stay the same
+    // glEnableVertexAttribArray(0);
     // glBindVertexArray(0); // no need to unbind at all as we directly bind a different VAO the next few lines
 
     // SECOND TRIANGLE SETUP
     glBindVertexArray(VAOs[1]);             // note that we bind to a different VAO now
     glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]); // and a different VBO
     glBufferData(GL_ARRAY_BUFFER, sizeof(secondTriangle), secondTriangle, GL_STATIC_DRAW);
+    // // position attribute
+    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
+    // glEnableVertexAttribArray(0);
+    // // color attribute
+    // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
+    // glEnableVertexAttribArray(1);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0); // because the vertex data is tightly packed we can also specify 0 as the vertex attribute's stride to let OpenGL figure it out
     glEnableVertexAttribArray(0);
     // glBindVertexArray(0); // not really necessary as well, but beware of calls that could affect VAOs while this one is bound (like binding element buffer objects, or enabling/disabling vertex attributes)
@@ -157,7 +167,7 @@ int main()
         float timeValue = glfwGetTime();
         float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
         int vertexColorLocation = glGetUniformLocation(shaderProgram, "myCustomColor");
-        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+        // glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
         // Draw FIRST triangle using the data from the first VAO...
         glBindVertexArray(VAOs[0]);
