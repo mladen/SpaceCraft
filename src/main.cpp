@@ -4,6 +4,8 @@
 #include <iostream>     // For console output
 #include <vector>       // For std::vector, a dynamic array (for storing vertices, colors, etc.) which help with dynamic memory allocation
 
+#include "shader.h" // Include the Shader class for handling shaders
+
 // Window dimensions
 const int WIDTH = 1368;
 const int HEIGHT = 768;
@@ -17,36 +19,6 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);      
 void processInput(GLFWwindow *window);                                                              // Callback function for keyboard input
 unsigned int compileShader(unsigned int type, const char *source);                                  // Function to compile a shader
 unsigned int createShaderProgram(const char *vertexShaderSource, const char *fragmentShaderSource); // Function to create a shader program
-
-// Shader sources
-const char *vertexShaderSource = "#version 330 core\n"
-                                 "layout (location = 0) in vec3 aPos;\n"   // the position variable has attribute position 0
-                                 "layout (location = 1) in vec3 aColor;\n" // the color variable has attribute position 1
-                                 "\n"
-                                 "out vec3 myCustomColor;\n" // output a color to the fragment shader
-                                 "\n"
-                                 "void main()\n"
-                                 "{\n"
-                                 "  gl_Position = vec4(aPos, 1.0);\n"
-                                 "  myCustomColor = aColor;\n" // set myCustomColor to the input color we got from the vertex data
-                                 "}\n";
-
-const char *fragmentShaderSource = "#version 330 core\n"
-                                   "out vec4 FragColor;\n"
-                                   "\n"
-                                   "in vec3 myCustomColor;\n"
-                                   "\n"
-                                   "void main()\n"
-                                   "{\n"
-                                   "  FragColor = vec4(myCustomColor, 1.0);\n"
-                                   "}\n";
-
-const char *fragmentShaderSourceFixed = "#version 330 core\n"
-                                        "out vec4 FragColor;\n"
-                                        "void main()\n"
-                                        "{\n"
-                                        "   FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
-                                        "}\n\0";
 
 int main()
 {
@@ -86,6 +58,11 @@ int main()
         return -1;
     }
 
+    // build and compile our shader program
+    // ------------------------------------
+    Shader myShader("../src/myVertexShader.vs", "../src/myFragmentShaderColors.fs");
+    // Shader ourShader("myVertexShader.vs", "myFragmentShaderColors.fs", "myFragmentShaderFixed.fs");
+
     // Set up vertex data (and buffer(s)) and configure vertex attributes
     float firstTrianglesVertices[] = {
         // First triangle
@@ -101,6 +78,13 @@ int main()
         0.9f, -0.5f, 0.0f, // right
         0.45f, 0.5f, 0.0f  // top
     };
+
+    // float secondTriangle[] = {
+    //     // positions         // colors
+    //     0.0f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, // yellow
+    //     0.9f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, // cyan
+    //     0.45f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f  // magenta
+    // };
 
     // Set up index data; This is used to specify which vertices make up each triangle
     // unsigned int indices[] = {
@@ -121,23 +105,14 @@ int main()
     // color attribute
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0); // Vertex attributes stay the same
-    // glEnableVertexAttribArray(0);
-    // glBindVertexArray(0); // no need to unbind at all as we directly bind a different VAO the next few lines
 
     // SECOND TRIANGLE SETUP
     glBindVertexArray(VAOs[1]);             // note that we bind to a different VAO now
     glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]); // and a different VBO
     glBufferData(GL_ARRAY_BUFFER, sizeof(secondTriangle), secondTriangle, GL_STATIC_DRAW);
-    // // position attribute
-    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
-    // glEnableVertexAttribArray(0);
-    // // color attribute
-    // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
-    // glEnableVertexAttribArray(1);
+
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0); // because the vertex data is tightly packed we can also specify 0 as the vertex attribute's stride to let OpenGL figure it out
-    glEnableVertexAttribArray(0);
-    // glBindVertexArray(0); // not really necessary as well, but beware of calls that could affect VAOs while this one is bound (like binding element buffer objects, or enabling/disabling vertex attributes)
+    // glEnableVertexAttribArray(0);
 
     // Note that this is allowed, the call to glVertexAttribPointer registered VBO as
     // the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
@@ -145,10 +120,6 @@ int main()
 
     // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens
     glBindVertexArray(0);
-
-    // Build and compile our shader program
-    unsigned int shaderProgram = createShaderProgram(vertexShaderSource, fragmentShaderSource);
-    unsigned int shaderProgramFixed = createShaderProgram(vertexShaderSource, fragmentShaderSourceFixed);
 
     // Main loop
     while (!glfwWindowShouldClose(window))
@@ -161,20 +132,16 @@ int main()
         glClearColor(0.0f, 0.875f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT); // Clear the color buffer
 
-        // UPDATE COLOR UNIFORM (this will be in the render loop since we want to change the color over time; if we set it outside the loop it would only change once)
-        // myCustomColor will be updated in the fragment shader
-        glUseProgram(shaderProgram);
-        float timeValue = glfwGetTime();
-        float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-        int vertexColorLocation = glGetUniformLocation(shaderProgram, "myCustomColor");
-        // glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+        // Activate shader
+        myShader.use();
+        // myShader.setFloat("offset", 1.0f);
 
         // Draw FIRST triangle using the data from the first VAO...
         glBindVertexArray(VAOs[0]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // ...then we draw the SECOND triangle using the data from the second(!) VAO
-        glUseProgram(shaderProgramFixed); // Use the fixed color shader program (Without this, the second triangle would also get the color from the first shader - changing green over time)
+        glUniform3f(glGetUniformLocation(myShader.ID, "uColor"), 0.0f, 1.0f, 0.0f); // green
         glBindVertexArray(VAOs[1]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -186,7 +153,6 @@ int main()
     // Clean up resources (Optional? Why?): de-allocate all resources once they've outlived their purpose
     glDeleteVertexArrays(2, VAOs);
     glDeleteBuffers(2, VBOs);
-    glDeleteProgram(shaderProgram);
 
     glfwDestroyWindow(window);
     glfwTerminate();
