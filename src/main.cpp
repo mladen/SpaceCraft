@@ -30,10 +30,12 @@ const char *vertexShaderSource = "#version 330 core\n"
 
 const char *fragmentShaderSource = "#version 330 core\n"
                                    "out vec4 FragColor;\n"
-                                   "in vec4 vertexColor;\n"
+                                   "\n"
+                                   "uniform vec4 myCustomColor;\n"
+                                   "\n"
                                    "void main()\n"
                                    "{\n"
-                                   "  FragColor = vertexColor;\n"
+                                   "  FragColor = myCustomColor;\n"
                                    "}\n";
 
 int main()
@@ -128,7 +130,7 @@ int main()
     glBindVertexArray(0);
 
     // Build and compile our shader program
-    unsigned int shaderProgramOrange = createShaderProgram(vertexShaderSource, fragmentShaderSource);
+    unsigned int shaderProgram = createShaderProgram(vertexShaderSource, fragmentShaderSource);
     // unsigned int shaderProgramYellow = createShaderProgram(vertexShaderSource, fragmentShader2Source);
 
     // Main loop
@@ -142,10 +144,18 @@ int main()
         glClearColor(0.0f, 0.875f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT); // Clear the color buffer
 
-        glUseProgram(shaderProgramOrange);
+        // UPDATE COLOR UNIFORM (this will be in the render loop since we want to change the color over time; if we set it outside the loop it would only change once)
+        // myCustomColor will be updated in the fragment shader
+        glUseProgram(shaderProgram);
+        float timeValue = glfwGetTime();
+        float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
+        int vertexColorLocation = glGetUniformLocation(shaderProgram, "myCustomColor");
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
         // Draw FIRST triangle using the data from the first VAO...
         glBindVertexArray(VAOs[0]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
+
         // ...then we draw the SECOND triangle using the data from the second(!) VAO
         glBindVertexArray(VAOs[1]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -158,7 +168,7 @@ int main()
     // Clean up resources (Optional? Why?): de-allocate all resources once they've outlived their purpose
     glDeleteVertexArrays(2, VAOs);
     glDeleteBuffers(2, VBOs);
-    glDeleteProgram(shaderProgramOrange);
+    glDeleteProgram(shaderProgram);
 
     glfwDestroyWindow(window);
     glfwTerminate();
