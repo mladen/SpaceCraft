@@ -63,6 +63,9 @@ int main()
     Shader myShader("../src/myVertexShader.vs", "../src/myFragmentShaderColors.fs");
     // Shader ourShader("myVertexShader.vs", "myFragmentShaderColors.fs", "myFragmentShaderFixed.fs");
 
+    // Moves the triangle right 0.5 units in the x direction
+    float offset = 0.7f;
+
     // Set up vertex data (and buffer(s)) and configure vertex attributes
     float firstTrianglesVertices[] = {
         // First triangle
@@ -136,6 +139,8 @@ int main()
         // Activate shader
         myShader.use();
         // myShader.setFloat("offset", 1.0f);
+
+        myShader.setFloat("xOffset", offset);
 
         // Draw FIRST triangle using the data from the first VAO...
         myShader.setBool("useUniformColor", false);
