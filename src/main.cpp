@@ -5,6 +5,7 @@
 #include <vector>       // For std::vector, a dynamic array (for storing vertices, colors, etc.) which help with dynamic memory allocation
 
 #include "shader.h" // Include the Shader class for handling shaders
+#include "stb.cpp"
 
 // Window dimensions
 const int WIDTH = 1368;
