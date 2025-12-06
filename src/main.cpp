@@ -5,7 +5,6 @@
 #include <vector>       // For std::vector, a dynamic array (for storing vertices, colors, etc.) which help with dynamic memory allocation
 
 #include "shader.h" // Include the Shader class for handling shaders
-#include "stb.cpp"
 
 // Window dimensions
 const int WIDTH = 1368;
@@ -16,10 +15,10 @@ const float RADIUS = 0.5f;
 const int NUM_SEGMENTS = 100;
 const float PI = 3.14159265359f;
 
-void framebuffer_size_callback(GLFWwindow *window, int width, int height);                          // Callback function for window resize
-void processInput(GLFWwindow *window);                                                              // Callback function for keyboard input
-unsigned int compileShader(unsigned int type, const char *source);                                  // Function to compile a shader
-unsigned int createShaderProgram(const char *vertexShaderSource, const char *fragmentShaderSource); // Function to create a shader program
+void framebuffer_size_callback(GLFWwindow *window, int width, int height);                    // Callback function for window resize
+void processInput(GLFWwindow *window);                                                        // Callback function for keyboard input
+GLuint compileShader(GLuint type, const char *source);                                        // Function to compile a shader
+GLuint createShaderProgram(const char *vertexShaderSource, const char *fragmentShaderSource); // Function to create a shader program
 
 int main()
 {
@@ -88,11 +87,11 @@ int main()
     // };
 
     // Set up index data; This is used to specify which vertices make up each triangle
-    // unsigned int indices[] = {
+    // GLuint indices[] = {
     //     0, 1, 2,  // first triangle; an indice of 0 refers to the first vertex (triplet of coordinates - (0.5, 0.5, 0.0) in our case)
     //     0, 2, 3}; // second triangle
 
-    unsigned int VBOs[2], VAOs[2];
+    GLuint VBOs[2], VAOs[2];
     glGenVertexArrays(2, VAOs); // we can also generate multiple VAOs or buffers at the same time
     glGenBuffers(2, VBOs);
 
@@ -177,10 +176,10 @@ void processInput(GLFWwindow *window)
         glfwSetWindowShouldClose(window, true);
 }
 
-unsigned int compileShader(unsigned int type, const char *source)
+GLuint compileShader(GLuint type, const char *source)
 {
     // Create shader
-    unsigned int shader = glCreateShader(type);
+    GLuint shader = glCreateShader(type);
     glShaderSource(shader, 1, &source, NULL);
     glCompileShader(shader);
 
@@ -200,14 +199,14 @@ unsigned int compileShader(unsigned int type, const char *source)
 }
 
 // Create and compile shader program
-unsigned int createShaderProgram(const char *vertexShaderSource, const char *fragmentShaderSource)
+GLuint createShaderProgram(const char *vertexShaderSource, const char *fragmentShaderSource)
 {
     // Compile shaders
-    unsigned int vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderSource);
-    unsigned int fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
+    GLuint vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderSource);
+    GLuint fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
 
     // Create shader program
-    unsigned int program = glCreateProgram();
+    GLuint program = glCreateProgram();
     glAttachShader(program, vertexShader);
     glAttachShader(program, fragmentShader);
     glLinkProgram(program);
