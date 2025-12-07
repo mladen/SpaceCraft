@@ -73,18 +73,11 @@ int main()
     };
 
     float secondTriangle[] = {
-        // Second triangle
-        0.0f, -0.5f, 0.0f, // left
-        0.9f, -0.5f, 0.0f, // right
-        0.45f, 0.5f, 0.0f  // top
+        // positions       // colors
+        0.0f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, // yellow
+        0.9f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, // cyan
+        0.45f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f  // magenta
     };
-
-    // float secondTriangle[] = {
-    //     // positions         // colors
-    //     0.0f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, // yellow
-    //     0.9f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, // cyan
-    //     0.45f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f  // magenta
-    // };
 
     // Set up index data; This is used to specify which vertices make up each triangle
     // GLuint indices[] = {
@@ -111,9 +104,27 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]); // and a different VBO
     glBufferData(GL_ARRAY_BUFFER, sizeof(secondTriangle), secondTriangle, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0); // because the vertex data is tightly packed we can also specify 0 as the vertex attribute's stride to let OpenGL figure it out
-    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+    // position attribute
+    glVertexAttribPointer(
+        0, // layout(location = 0)
+        3, // xyz
+        GL_FLOAT,
+        GL_FALSE,
+        6 * sizeof(float), // STRIDE: 6 floats per vertex
+        (void *)0          // OFFSET: start at beginning
+    );
     glEnableVertexAttribArray(0);
+
+    // color attribute
+    glVertexAttribPointer(
+        1, // layout(location = 1)
+        3, // r g b
+        GL_FLOAT,
+        GL_FALSE,
+        6 * sizeof(float),          // STRIDE: 6 floats again
+        (void *)(3 * sizeof(float)) // OFFSET: skip xyz
+    );
+    glEnableVertexAttribArray(1);
 
     // Note that this is allowed, the call to glVertexAttribPointer registered VBO as
     // the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
