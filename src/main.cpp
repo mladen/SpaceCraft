@@ -6,6 +6,8 @@
 
 #include "shader.h" // Include the Shader class for handling shaders
 
+#include "stb_image.h" // Include stb_image for image loading
+
 // Window dimensions
 const int WIDTH = 1368;
 const int HEIGHT = 768;
@@ -73,10 +75,10 @@ int main()
     };
 
     float secondTriangle[] = {
-        // positions       // colors
-        0.0f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, // yellow
-        0.9f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, // cyan
-        0.45f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f  // magenta
+        // positions       // colors         // texture coords
+        0.0f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, // yellow
+        0.9f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, // cyan
+        0.45f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f  // magenta
     };
 
     // Set up index data; This is used to specify which vertices make up each triangle
@@ -84,7 +86,7 @@ int main()
     //     0, 1, 2,  // first triangle; an indice of 0 refers to the first vertex (triplet of coordinates - (0.5, 0.5, 0.0) in our case)
     //     0, 2, 3}; // second triangle
 
-    GLuint VBOs[2], VAOs[2];
+    GLuint VAOs[2], VBOs[2];    // VAOs are used to store the state needed to supply vertex data to the GPU; VBOs are used to store vertex data in GPU memory
     glGenVertexArrays(2, VAOs); // we can also generate multiple VAOs or buffers at the same time
     glGenBuffers(2, VBOs);
 
@@ -99,39 +101,61 @@ int main()
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    // SECOND TRIANGLE SETUP
+    // SECOND TRIANGLE SETUP (position + color + texture coordinates)
     glBindVertexArray(VAOs[1]);             // note that we bind to a different VAO now
     glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]); // and a different VBO
     glBufferData(GL_ARRAY_BUFFER, sizeof(secondTriangle), secondTriangle, GL_STATIC_DRAW);
 
-    // position attribute
+    // Position attribute
     glVertexAttribPointer(
         0, // layout(location = 0)
         3, // xyz
         GL_FLOAT,
         GL_FALSE,
-        6 * sizeof(float), // STRIDE: 6 floats per vertex
+        8 * sizeof(float), // STRIDE: 8 floats per vertex
         (void *)0          // OFFSET: start at beginning
     );
     glEnableVertexAttribArray(0);
 
-    // color attribute
+    // Color attribute
     glVertexAttribPointer(
         1, // layout(location = 1)
         3, // r g b
         GL_FLOAT,
         GL_FALSE,
-        6 * sizeof(float),          // STRIDE: 6 floats again
+        8 * sizeof(float),          // STRIDE: 6 floats again
         (void *)(3 * sizeof(float)) // OFFSET: skip xyz
     );
     glEnableVertexAttribArray(1);
 
-    // Note that this is allowed, the call to glVertexAttribPointer registered VBO as
-    // the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0); // This is optional, but it's a good practice to unbind any buffers to prevent bugs
+    // Texture coordinate attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
-    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens
-    glBindVertexArray(0);
+    // TEXTURE SETUP WOULD GO HERE
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load("../images/texture.jpg", &width, &height, &nrChannels, 0);
+
+    GLuint texture;
+    glGenTextures(1, &texture);            // Generate texture ID
+    glActiveTexture(GL_TEXTURE0);          // Activate the texture unit first before binding texture
+    glBindTexture(GL_TEXTURE_2D, texture); // All upcoming GL_TEXTURE_2D operations now have effect on this texture object
+
+    // Set the texture wrapping/filtering options (on the currently bound texture object)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // Set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); // Set texture wrapping to GL_REPEAT (default wrapping method)
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data); // Load image data into texture
+    glGenerateMipmap(GL_TEXTURE_2D);                                                          // Generate mipmaps for the texture
+
+    stbi_image_free(data); // Free image data after generating the texture
+
+    GLuint texture1Uni = glGetUniformLocation(myShader.ID, "texture1");
+    myShader.use();              // Activate/use the shader before setting uniforms!
+    glUniform1i(texture1Uni, 0); // Set it manually
 
     // Main loop
     while (!glfwWindowShouldClose(window))
@@ -167,6 +191,8 @@ int main()
     // Clean up resources (Optional? Why?): de-allocate all resources once they've outlived their purpose
     glDeleteVertexArrays(2, VAOs);
     glDeleteBuffers(2, VBOs);
+
+    glDeleteTextures(1, &texture);
 
     glfwDestroyWindow(window);
     glfwTerminate();
