@@ -64,7 +64,7 @@ int main()
     // Shader ourShader("myVertexShader.vs", "myFragmentShaderColors.fs", "myFragmentShaderFixed.fs");
 
     // Set up vertex data (and buffer(s)) and configure vertex attributes
-    float firstTrianglesVertices[] = {
+    float trianglesVertices[] = {
         // First triangle
         // Positions (first 3 values) // Colors (last 3 values)
         -0.9f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f,  // left
@@ -72,11 +72,12 @@ int main()
         -0.45f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f // bottom
     };
 
-    float secondTriangle[] = {
+    float squareVertices[] = {
         // positions       // colors         // texture coords
         0.0f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, // yellow
-        0.9f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, // cyan
-        0.45f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f  // magenta
+        0.9f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, // cyan
+        0.45f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, // magenta
+        0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f   // blue
     };
 
     // Set up index data; This is used to specify which vertices make up each triangle
@@ -88,10 +89,10 @@ int main()
     glGenVertexArrays(2, VAOs); // we can also generate multiple VAOs or buffers at the same time
     glGenBuffers(2, VBOs);
 
-    // FIRST TRIANGLE SETUP
+    // TRIANGLE SETUP
     glBindVertexArray(VAOs[0]);
     glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(firstTrianglesVertices), firstTrianglesVertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(trianglesVertices), trianglesVertices, GL_STATIC_DRAW);
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
@@ -99,17 +100,17 @@ int main()
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    // SECOND TRIANGLE SETUP (position + color + texture coordinates)
+    // SQUARE SETUP (position + color + texture coordinates)
     glBindVertexArray(VAOs[1]);             // note that we bind to a different VAO now
     glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]); // and a different VBO
-    glBufferData(GL_ARRAY_BUFFER, sizeof(secondTriangle), secondTriangle, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(squareVertices), squareVertices, GL_STATIC_DRAW);
 
     // Position attribute
     glVertexAttribPointer(
-        0, // layout(location = 0)
-        3, // xyz
-        GL_FLOAT,
-        GL_FALSE,
+        0,                 // layout(location = 0)
+        3,                 // xyz
+        GL_FLOAT,          // type
+        GL_FALSE,          // normalized?
         8 * sizeof(float), // STRIDE: 8 floats per vertex
         (void *)0          // OFFSET: start at beginning
     );
@@ -117,11 +118,11 @@ int main()
 
     // Color attribute
     glVertexAttribPointer(
-        1, // layout(location = 1)
-        3, // r g b
-        GL_FLOAT,
-        GL_FALSE,
-        8 * sizeof(float),          // STRIDE: 6 floats again
+        1,                          // layout(location = 1)
+        3,                          // r g b
+        GL_FLOAT,                   // type
+        GL_FALSE,                   // normalized?
+        8 * sizeof(float),          // STRIDE: 8 floats per vertex
         (void *)(3 * sizeof(float)) // OFFSET: skip xyz
     );
     glEnableVertexAttribArray(1);
@@ -132,7 +133,8 @@ int main()
 
     // TEXTURE SETUP WOULD GO HERE
     int width, height, nrChannels;
-    unsigned char *data = stbi_load("../images/texture.jpg", &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load("../images/block_yellow.png", &width, &height, &nrChannels, 0);
+    // unsigned char *data = stbi_load("../images/texture1.png", &width, &height, &nrChannels, 0);
 
     GLuint texture;
     glGenTextures(1, &texture);            // Generate texture ID
@@ -152,7 +154,8 @@ int main()
     stbi_image_free(data); // Free image data after generating the texture
 
     GLuint texture1Uni = glGetUniformLocation(myShader.ID, "texture1");
-    myShader.use();              // Activate/use the shader before setting uniforms!
+    myShader.use();
+    // glUniform1f(glGetUniformLocation(myShader.ID, "scale"), 0.0f);
     glUniform1i(texture1Uni, 0); // Set it manually
 
     // Main loop
@@ -171,15 +174,15 @@ int main()
         // myShader.setFloat("offset", 1.0f);
 
         // Draw FIRST triangle using the data from the first VAO...
-        myShader.setBool("useUniformColor", false);
+        // myShader.setBool("useUniformColor", false);
         glBindVertexArray(VAOs[0]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // ...then we draw the SECOND triangle using the data from the second(!) VAO
-        myShader.setBool("useUniformColor", true);
-        glUniform3f(glGetUniformLocation(myShader.ID, "uColor"), 0.0f, 1.0f, 0.0f); // green
+        // myShader.setBool("useUniformColor", true);
+        // glUniform3f(glGetUniformLocation(myShader.ID, "uColor"), 0.0f, 1.0f, 0.0f); // green
         glBindVertexArray(VAOs[1]);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_TRIANGLES, 0, 4); // Drawing 4 vertices starting from index 0 -> 2 triangles
 
         // Swap buffers and poll events
         glfwSwapBuffers(window); // Swaps the front and back buffers
