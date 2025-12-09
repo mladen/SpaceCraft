@@ -17,10 +17,8 @@ const float RADIUS = 0.5f;
 const int NUM_SEGMENTS = 100;
 const float PI = 3.14159265359f;
 
-void framebuffer_size_callback(GLFWwindow *window, int width, int height);                    // Callback function for window resize
-void processInput(GLFWwindow *window);                                                        // Callback function for keyboard input
-GLuint compileShader(GLuint type, const char *source);                                        // Function to compile a shader
-GLuint createShaderProgram(const char *vertexShaderSource, const char *fragmentShaderSource); // Function to create a shader program
+void framebuffer_size_callback(GLFWwindow *window, int width, int height); // Callback function for window resize
+void processInput(GLFWwindow *window);                                     // Callback function for keyboard input
 
 int main()
 {
@@ -211,57 +209,4 @@ void processInput(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-}
-
-GLuint compileShader(GLuint type, const char *source)
-{
-    // Create shader
-    GLuint shader = glCreateShader(type);
-    glShaderSource(shader, 1, &source, NULL);
-    glCompileShader(shader);
-
-    // Check for shader compilation errors
-    int success;
-    char infoLog[512];
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(shader, 512, NULL, infoLog);
-        std::cerr << "ERROR::SHADER::" << (type == GL_VERTEX_SHADER ? "VERTEX" : "FRAGMENT")
-                  << "::COMPILATION_FAILED\n"
-                  << infoLog << std::endl;
-    }
-
-    return shader;
-}
-
-// Create and compile shader program
-GLuint createShaderProgram(const char *vertexShaderSource, const char *fragmentShaderSource)
-{
-    // Compile shaders
-    GLuint vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderSource);
-    GLuint fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
-
-    // Create shader program
-    GLuint program = glCreateProgram();
-    glAttachShader(program, vertexShader);
-    glAttachShader(program, fragmentShader);
-    glLinkProgram(program);
-
-    // Check for linking errors
-    int success;
-    char infoLog[512];
-    glGetProgramiv(program, GL_LINK_STATUS, &success);
-    if (!success)
-    {
-        glGetProgramInfoLog(program, 512, NULL, infoLog);
-        std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
-                  << infoLog << std::endl;
-    }
-
-    // Delete shaders as they're linked into the program and no longer necessary
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
-    return program;
 }
