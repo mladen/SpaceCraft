@@ -64,7 +64,7 @@ int main()
     // Shader ourShader("myVertexShader.vs", "myFragmentShaderColors.fs", "myFragmentShaderFixed.fs");
 
     // Set up vertex data (and buffer(s)) and configure vertex attributes
-    float trianglesVertices[] = {
+     float triangleVertices[] = {
         // First triangle
         // Positions (first 3 values) // Colors (last 3 values)
         -0.9f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f,  // left
@@ -72,21 +72,7 @@ int main()
         -0.45f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f // bottom
     };
 
-    float squareVertices[] = {
-        // positions       // colors         // texture coords
-        0.0f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, // yellow
-        0.9f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, // cyan
-        0.45f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, // magenta
-        0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f   // blue
-    };
-
-    // Set up index data; This is used to specify which vertices make up each triangle
-    // GLuint indices[] = {
-    //     0, 1, 2,  // first triangle; an indice of 0 refers to the first vertex (triplet of coordinates - (0.5, 0.5, 0.0) in our case)
-    //     0, 2, 3}; // second triangle
-
-    GLuint VAOs[2], VBOs[2];    // VAOs are used to store the state needed to supply vertex data to the GPU; VBOs are used to store vertex data in GPU memory
-    glGenVertexArrays(2, VAOs); // we can also generate multiple VAOs or buffers at the same time
+    GLuint VAOs[2], VBOs[2];
     glGenBuffers(2, VBOs);
 
     // TRIANGLE SETUP
@@ -100,9 +86,24 @@ int main()
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    // SQUARE SETUP (position + color + texture coordinates)
-    glBindVertexArray(VAOs[1]);             // note that we bind to a different VAO now
-    glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]); // and a different VBO
+    // Square (two triangles)
+    float squareVertices[] = {
+        // positions        // texCoords
+        0.0f, -0.5f, 0.0f, 0.0f, 0.0f, // bottom left
+        0.9f, -0.5f, 0.0f, 1.0f, 0.0f, // bottom right
+        0.9f, 0.5f, 0.0f, 1.0f, 1.0f,  // top right
+        0.0f, 0.5f, 0.0f, 0.0f, 1.0f}; // top left
+
+    // float texCoords[] = {
+    //     0.0f, 0.0f, // bottom left
+    //     1.0f, 0.0f, // bottom right
+    //     1.0f, 1.0f, // top right
+    //     0.0f, 1.0f  // top left
+    // };
+
+    unsigned int squareIndices[] = {0, 1, 2, 0, 2, 3}; // two triangles; first triangle: 0, 1, 2; second triangle: 0, 2, 3;
+                                                       // this is used for EBO, which is Element Buffer Object which means we can reuse vertices
+
     glBufferData(GL_ARRAY_BUFFER, sizeof(squareVertices), squareVertices, GL_STATIC_DRAW);
 
     // Position attribute
