@@ -91,10 +91,16 @@ int main()
     // Square (two triangles)
     float squareVertices[] = {
         // positions        // texCoords
-        0.0f, -0.5f, 0.0f, 0.0f, 0.0f, // bottom left
-        0.9f, -0.5f, 0.0f, 1.0f, 0.0f, // bottom right
-        0.9f, 0.5f, 0.0f, 1.0f, 1.0f,  // top right
-        0.0f, 0.5f, 0.0f, 0.0f, 1.0f}; // top left
+        0.0f, -0.5f, 0.0f, 0.0f, 0.0f,  // bottom left
+        0.9f, -0.5f, 0.0f, 0.25f, 0.0f, // bottom right
+        0.9f, 0.5f, 0.0f, 0.25f, 0.25f, // top right
+        0.0f, 0.5f, 0.0f, 0.0f, 0.25f}; // top left
+
+    // Old texture coordinates
+    // 0.0f, -0.5f, 0.0f, 0.0f, 0.0f, // bottom left
+    // 0.9f, -0.5f, 0.0f, 1.0f, 0.0f, // bottom right
+    // 0.9f, 0.5f, 0.0f, 1.0f, 1.0f,  // top right
+    // 0.0f, 0.5f, 0.0f, 0.0f, 1.0f}; // top left
 
     // float texCoords[] = {
     //     0.0f, 0.0f, // bottom left
@@ -156,7 +162,7 @@ int main()
 
     int width, height, nrChannels;
     // unsigned char *data = stbi_load("../images/block_yellow.png", &width, &height, &nrChannels, 0);
-    unsigned char *data = stbi_load("../images/container.jpg", &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load("../images/minecraft_textures.jpg", &width, &height, &nrChannels, 0);
     if (!data)
     {
         std::cerr << "Failed to load texture" << std::endl;
