@@ -29,6 +29,9 @@ int main()
         return -1;
     }
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     // Configure GLFW
     // Tells GLFW what version of OpenGL to use. In this case we're using OpenGL 3.3
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // Sets the major version of the OpenGL context to 3
@@ -79,11 +82,15 @@ int main()
     // TRIANGLE SETUP
     // Triangle VAO
     glBindVertexArray(VAOs[0]);
+
+    // Triangle VBO
     glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
+
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
+
     // color attribute
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
@@ -178,9 +185,7 @@ int main()
 
     stbi_image_free(data); // Free image data after generating the texture
 
-    // I don't need this?
-    // myShader.use();
-    // myShader.setInt("myTexture", 0); // Set the texture uniform to texture unit 0
+    myShader.setInt("myTexture", 0); // Set the texture uniform to texture unit 0
 
     while (!glfwWindowShouldClose(window))
     {
@@ -192,6 +197,9 @@ int main()
         glClearColor(0.0f, 0.875f, 1.0f, 1.0f); // Set the clear color to a nice blue color
         glClear(GL_COLOR_BUFFER_BIT);           // Clear the color buffer
 
+        glActiveTexture(GL_TEXTURE0);          // Activate the texture unit first
+        glBindTexture(GL_TEXTURE_2D, texture); // Bind the texture
+
         myShader.use(); // Use the shader program
 
         // Triangle
@@ -199,9 +207,7 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 3); // Draw the triangle (3 vertices)
 
         // Square
-        glBindVertexArray(VAOs[1]); // Bind the square VAO
-        // glActiveTexture(GL_TEXTURE0);                        // Activate the texture unit first
-        // glBindTexture(GL_TEXTURE_2D, texture);               // Bind the texture
+        glBindVertexArray(VAOs[1]);                          // Bind the square VAO
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // Draw the square using the EBO (6 indices)
 
         glfwSwapBuffers(window); // Swap the front and back buffers
