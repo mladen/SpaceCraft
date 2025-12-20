@@ -64,7 +64,7 @@ int main()
     // Shader ourShader("myVertexShader.vs", "myFragmentShaderColors.fs", "myFragmentShaderFixed.fs");
 
     // Set up vertex data (and buffer(s)) and configure vertex attributes
-     float triangleVertices[] = {
+    float triangleVertices[] = {
         // First triangle
         // Positions (first 3 values) // Colors (last 3 values)
         -0.9f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f,  // left
@@ -73,12 +73,14 @@ int main()
     };
 
     GLuint VAOs[2], VBOs[2];
+    glGenVertexArrays(2, VAOs);
     glGenBuffers(2, VBOs);
 
     // TRIANGLE SETUP
+    // Triangle VAO
     glBindVertexArray(VAOs[0]);
     glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(trianglesVertices), trianglesVertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
@@ -104,27 +106,34 @@ int main()
     unsigned int squareIndices[] = {0, 1, 2, 0, 2, 3}; // two triangles; first triangle: 0, 1, 2; second triangle: 0, 2, 3;
                                                        // this is used for EBO, which is Element Buffer Object which means we can reuse vertices
 
-    glBufferData(GL_ARRAY_BUFFER, sizeof(squareVertices), squareVertices, GL_STATIC_DRAW);
+    // SQUARE SETUP
+    // VAO and VBO setup for square
+    // VAO is like a container for VBO and attribute settings
+    // VBO is where the actual vertex data is stored
+    glBindVertexArray(VAOs[1]);             // Bind the square VAO
+    glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]); // Bind the square VBO
 
-    // Position attribute
+    glBufferData(GL_ARRAY_BUFFER, sizeof(squareVertices), squareVertices, GL_STATIC_DRAW); // Copy the square vertices into the VBO
+
+    // Position attribute of square
     glVertexAttribPointer(
         0,                 // layout(location = 0)
-        3,                 // xyz
-        GL_FLOAT,          // type
+        3,                 // xyz, so 3 components
+        GL_FLOAT,          // type, float
         GL_FALSE,          // normalized?
-        8 * sizeof(float), // STRIDE: 8 floats per vertex
+        5 * sizeof(float), // STRIDE: 5 floats per vertex
         (void *)0          // OFFSET: start at beginning
     );
     glEnableVertexAttribArray(0);
 
-    // Color attribute
+    // Color attribute of square
     glVertexAttribPointer(
         1,                          // layout(location = 1)
-        3,                          // r g b
+        2,                          // uv, so 2 components
         GL_FLOAT,                   // type
         GL_FALSE,                   // normalized?
-        8 * sizeof(float),          // STRIDE: 8 floats per vertex
-        (void *)(3 * sizeof(float)) // OFFSET: skip xyz
+        5 * sizeof(float),          // STRIDE: 5 floats per vertex
+        (void *)(3 * sizeof(float)) // OFFSET: after the first 3 floats (in other words, skip position data)
     );
     glEnableVertexAttribArray(1);
 
