@@ -137,9 +137,11 @@ int main()
     );
     glEnableVertexAttribArray(1);
 
-    // Texture coordinate attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+    // EBO setup
+    GLuint EBO;            // Element Buffer Object, which is used to store indices
+    glGenBuffers(1, &EBO); // &EBO to get the address of EBO
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(squareIndices), squareIndices, GL_STATIC_DRAW);
 
     // TEXTURE SETUP WOULD GO HERE
     int width, height, nrChannels;
