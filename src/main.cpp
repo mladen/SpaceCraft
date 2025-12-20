@@ -178,43 +178,37 @@ int main()
 
     while (!glfwWindowShouldClose(window))
     {
-        // Process input
-        processInput(window);
+        // RENDER LOOP
 
-        // Rendering
-        // glClearColor(0.072f, 0.13f, 0.17f, 1.0f);
-        glClearColor(0.0f, 0.875f, 1.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT); // Clear the color buffer
+        processInput(window); // Check for user input
 
-        // Activate shader
-        myShader.use();
-        // myShader.setFloat("offset", 1.0f);
+        // Rendering commands here
+        glClearColor(0.0f, 0.875f, 1.0f, 1.0f); // Set the clear color to a nice blue color
+        glClear(GL_COLOR_BUFFER_BIT);           // Clear the color buffer
 
-        // Draw FIRST triangle using the data from the first VAO...
-        // myShader.setBool("useUniformColor", false);
-        glBindVertexArray(VAOs[0]);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        myShader.use(); // Use the shader program
 
-        // ...then we draw the SECOND triangle using the data from the second(!) VAO
-        // myShader.setBool("useUniformColor", true);
-        // glUniform3f(glGetUniformLocation(myShader.ID, "uColor"), 0.0f, 1.0f, 0.0f); // green
-        glBindVertexArray(VAOs[1]);
-        glDrawArrays(GL_TRIANGLES, 0, 4); // Drawing 4 vertices starting from index 0 -> 2 triangles
+        // Triangle
+        glBindVertexArray(VAOs[0]);       // Bind the triangle VAO
+        glDrawArrays(GL_TRIANGLES, 0, 3); // Draw the triangle (3 vertices)
 
-        // Swap buffers and poll events
-        glfwSwapBuffers(window); // Swaps the front and back buffers
-        glfwPollEvents();        // Polls for and processes events
+        // Square
+        glBindVertexArray(VAOs[1]); // Bind the square VAO
+        // glActiveTexture(GL_TEXTURE0);                        // Activate the texture unit first
+        // glBindTexture(GL_TEXTURE_2D, texture);               // Bind the texture
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // Draw the square using the EBO (6 indices)
+
+        glfwSwapBuffers(window); // Swap the front and back buffers
+        glfwPollEvents();
     }
 
-    // Clean up resources (Optional? Why?): de-allocate all resources once they've outlived their purpose
+    // Clean up resources
     glDeleteVertexArrays(2, VAOs);
     glDeleteBuffers(2, VBOs);
-
+    glDeleteBuffers(1, &EBO);
     glDeleteTextures(1, &texture);
 
-    glfwDestroyWindow(window);
     glfwTerminate();
-
     return 0;
 }
 
