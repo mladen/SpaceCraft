@@ -144,33 +144,38 @@ int main()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(squareIndices), squareIndices, GL_STATIC_DRAW);
 
     // TEXTURE SETUP WOULD GO HERE
-    int width, height, nrChannels;
-    unsigned char *data = stbi_load("../images/block_yellow.png", &width, &height, &nrChannels, 0);
-    // unsigned char *data = stbi_load("../images/texture1.png", &width, &height, &nrChannels, 0);
+    // (loading an image, generating a texture, binding it, setting its parameters, and generating mipmaps)
+    GLuint texture;                        // Texture variable
+    glGenTextures(1, &texture);            // 1 means generate 1 texture; &texture is the address of the texture variable
+    glBindTexture(GL_TEXTURE_2D, texture); // Bind the texture to GL_TEXTURE_2D target
 
-    GLuint texture;
-    glGenTextures(1, &texture);            // Generate texture ID
-    glActiveTexture(GL_TEXTURE0);          // Activate the texture unit first before binding texture
-    glBindTexture(GL_TEXTURE_2D, texture); // All upcoming GL_TEXTURE_2D operations now have effect on this texture object
-
-    // Set the texture wrapping/filtering options (on the currently bound texture object)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT); // Set texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // Set texture filtering parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // Set texture wrapping to GL_REPEAT (default wrapping method)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); // Set texture wrapping to GL_REPEAT (default wrapping method)
+    int width, height, nrChannels;
+    // unsigned char *data = stbi_load("../images/block_yellow.png", &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load("../images/container.jpg", &width, &height, &nrChannels, 0);
+    if (!data)
+    {
+        std::cerr << "Failed to load texture" << std::endl;
+        return -1;
+    }
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data); // Load image data into texture
-    glGenerateMipmap(GL_TEXTURE_2D);                                                          // Generate mipmaps for the texture
+    int format = (nrChannels == 4 ? GL_RGBA : GL_RGB);                                        // Determine the format based on number of channels
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data); // Load the texture data into OpenGL
+
+    glGenerateMipmap(GL_TEXTURE_2D);                                                // Generate mipmaps, which are smaller versions of the texture for better performance at a distance
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // Set texture filtering parameters for minification
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);               // Set texture filtering parameters for magnification
 
     stbi_image_free(data); // Free image data after generating the texture
 
-    GLuint texture1Uni = glGetUniformLocation(myShader.ID, "texture1");
-    myShader.use();
-    // glUniform1f(glGetUniformLocation(myShader.ID, "scale"), 0.0f);
-    glUniform1i(texture1Uni, 0); // Set it manually
+    // I don't need this?
+    // myShader.use();
+    // myShader.setInt("texture1", 0); // Set the texture uniform to texture unit 0
 
-    // Main loop
     while (!glfwWindowShouldClose(window))
     {
         // Process input
