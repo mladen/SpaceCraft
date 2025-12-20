@@ -127,7 +127,7 @@ int main()
         3,                 // xyz, so 3 components
         GL_FLOAT,          // type, float
         GL_FALSE,          // normalized?
-        5 * sizeof(float), // STRIDE: 5 floats per vertex
+        5 * sizeof(float), // STRIDE: 5 floats per vertex; 5 floats in a row in the array (3 for position, 2 for uv) represent a single vertex; u and v are texture coordinates
         (void *)0          // OFFSET: start at beginning
     );
     glEnableVertexAttribArray(0);
@@ -180,7 +180,7 @@ int main()
 
     // I don't need this?
     // myShader.use();
-    // myShader.setInt("texture1", 0); // Set the texture uniform to texture unit 0
+    // myShader.setInt("myTexture", 0); // Set the texture uniform to texture unit 0
 
     while (!glfwWindowShouldClose(window))
     {
