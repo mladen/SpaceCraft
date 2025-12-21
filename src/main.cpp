@@ -64,7 +64,7 @@ int main()
     // build and compile our shader program
     // ------------------------------------
     Shader myShader("../src/myVertexShader.vs", "../src/myFragmentShaderColors.fs");
-    // Shader ourShader("myVertexShader.vs", "myFragmentShaderColors.fs", "myFragmentShaderFixed.fs");
+    // NOTE: For triangle I'll just reuse this shader even though logically it should have its own shader!
 
     // Set up vertex data (and buffer(s)) and configure vertex attributes
     float triangleVertices[] = {
@@ -144,19 +144,19 @@ int main()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(squareIndices), squareIndices, GL_STATIC_DRAW);
 
-    // TEXTURE SETUP WOULD GO HERE
-    // (loading an image, generating a texture, binding it, setting its parameters, and generating mipmaps)
-    GLuint texture;                        // Texture variable
-    glGenTextures(1, &texture);            // 1 means generate 1 texture; &texture is the address of the texture variable
-    glBindTexture(GL_TEXTURE_2D, texture); // Bind the texture to GL_TEXTURE_2D target
+    // TEXTURE SETUP
+    GLuint texture;             // Texture variable
+    glGenTextures(1, &texture); // 1 means generate 1 texture; &texture is the address of the texture variable
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT); // Set texture wrapping parameters
+    glActiveTexture(GL_TEXTURE0); // Explicitly use texture unit 0, which means that when we bind the texture, it will be bound to texture unit 0
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // Set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     int width, height, nrChannels;
-    // unsigned char *data = stbi_load("../images/block_yellow.png", &width, &height, &nrChannels, 0);
     unsigned char *data = stbi_load("../images/minecraft_textures.jpg", &width, &height, &nrChannels, 0);
     if (!data)
     {
@@ -164,16 +164,15 @@ int main()
         return -1;
     }
 
-    int format = (nrChannels == 4 ? GL_RGBA : GL_RGB);                                        // Determine the format based on number of channels
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data); // Load the texture data into OpenGL
+    int format = (nrChannels == 4 ? GL_RGBA : GL_RGB);
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
 
-    glGenerateMipmap(GL_TEXTURE_2D);                                                // Generate mipmaps, which are smaller versions of the texture for better performance at a distance
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // Set texture filtering parameters for minification
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);               // Set texture filtering parameters for magnification
+    stbi_image_free(data);
 
-    stbi_image_free(data); // Free image data after generating the texture
-
-    myShader.setInt("myTexture", 0); // Set the texture uniform to texture unit 0
+    // Set texture sampler ONCE (program must be active)
+    myShader.use();
+    myShader.setInt("myTexture", 0);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -181,24 +180,24 @@ int main()
 
         processInput(window); // Check for user input
 
-        // Rendering commands here
+        // Rendering commands
         glClearColor(0.0f, 0.875f, 1.0f, 1.0f); // Set the clear color to a nice blue color
         glClear(GL_COLOR_BUFFER_BIT);           // Clear the color buffer
 
-        glActiveTexture(GL_TEXTURE0);          // Activate the texture unit first
+        myShader.use(); // Activate the shader program
+
+        // Triangle (note: still works, but logically should have its own shader)
+        glBindVertexArray(VAOs[0]);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        // Square (textured + alpha)
+        glActiveTexture(GL_TEXTURE0);          // Activate texture unit 0
         glBindTexture(GL_TEXTURE_2D, texture); // Bind the texture
 
-        myShader.use(); // Use the shader program
+        glBindVertexArray(VAOs[1]);                          // Bind the VAO for the square
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // Draw the square using the EBO
 
-        // Triangle
-        glBindVertexArray(VAOs[0]);       // Bind the triangle VAO
-        glDrawArrays(GL_TRIANGLES, 0, 3); // Draw the triangle (3 vertices)
-
-        // Square
-        glBindVertexArray(VAOs[1]);                          // Bind the square VAO
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // Draw the square using the EBO (6 indices)
-
-        glfwSwapBuffers(window); // Swap the front and back buffers
+        glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
@@ -214,9 +213,7 @@ int main()
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
-    glViewport(0, 0, width, height); // Sets the viewport to cover the entire window;
-                                     // It does it initially when the window is created
-                                     // and whenever the window is resized!
+    glViewport(0, 0, width, height); // Sets the viewport to cover the entire window
 }
 
 void processInput(GLFWwindow *window)
