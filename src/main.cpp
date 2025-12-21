@@ -4,15 +4,14 @@
 #include <iostream>     // For console output
 #include <vector>       // For std::vector, a dynamic array (for storing vertices, colors, etc.) which help with dynamic memory allocation
 
-#include "shader.h" // Include the Shader class for handling shaders
-
+#include "shader.h"    // Include the Shader class for handling shaders
 #include "stb_image.h" // Include stb_image for image loading
 
 // Window dimensions
 const int WIDTH = 1368;
 const int HEIGHT = 768;
 
-// Circle properties
+// Circle properties (currently unused, but fine)
 const float RADIUS = 0.5f;
 const int NUM_SEGMENTS = 100;
 const float PI = 3.14159265359f;
@@ -28,9 +27,6 @@ int main()
         std::cerr << "Failed to initialize GLFW" << std::endl;
         return -1;
     }
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Configure GLFW
     // Tells GLFW what version of OpenGL to use. In this case we're using OpenGL 3.3
@@ -50,7 +46,7 @@ int main()
         return -1;
     }
 
-    glfwMakeContextCurrent(window);                                    // Introduces the window into the current context, which means it becomes the current OpenGL context
+    glfwMakeContextCurrent(window);                                    // Introduces the window into the current context, making it the target for OpenGL commands
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // Sets the callback function for when the window is resized
 
     // Initialize GLAD, which handles the OpenGL function pointers
@@ -61,6 +57,10 @@ int main()
         return -1;
     }
 
+    // ENABLE BLENDING (must be AFTER context + GLAD)
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     // build and compile our shader program
     // ------------------------------------
     Shader myShader("../src/myVertexShader.vs", "../src/myFragmentShaderColors.fs");
@@ -68,22 +68,24 @@ int main()
 
     // Set up vertex data (and buffer(s)) and configure vertex attributes
     float triangleVertices[] = {
-        // First triangle
-        // Positions (first 3 values) // Colors (last 3 values)
-        -0.9f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f,  // left
-        -0.0f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f,  // right
-        -0.45f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f // bottom
-    };
+        // Positions            Colors
+        // x, y, z              r, g, b
+        // (first three values) (last three values)
+        -0.9f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f,    // Red, bottom left
+        -0.0f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f,    // Green, bottom right
+        -0.45f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f}; // Blue, top
 
     GLuint VAOs[2], VBOs[2];
     glGenVertexArrays(2, VAOs);
     glGenBuffers(2, VBOs);
 
     // TRIANGLE SETUP
-    // Triangle VAO
+    // VAO (Vertex Array Object) stores the configuration of vertex attributes and the bindings of VBOs
+    // Bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s)
     glBindVertexArray(VAOs[0]);
 
-    // Triangle VBO
+    // VBO (Vertex Buffer Object) is used to store vertex data in GPU memory
+    // Copy our vertices array in a vertex buffer for OpenGL to use
     glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
 
@@ -97,24 +99,11 @@ int main()
 
     // Square (two triangles)
     float squareVertices[] = {
-        // positions        // texCoords
+        // positions        // texCoords (texture coordinates)
         0.0f, -0.5f, 0.0f, 0.0f, 0.0f,  // bottom left
         0.9f, -0.5f, 0.0f, 0.25f, 0.0f, // bottom right
         0.9f, 0.5f, 0.0f, 0.25f, 0.25f, // top right
         0.0f, 0.5f, 0.0f, 0.0f, 0.25f}; // top left
-
-    // Old texture coordinates
-    // 0.0f, -0.5f, 0.0f, 0.0f, 0.0f, // bottom left
-    // 0.9f, -0.5f, 0.0f, 1.0f, 0.0f, // bottom right
-    // 0.9f, 0.5f, 0.0f, 1.0f, 1.0f,  // top right
-    // 0.0f, 0.5f, 0.0f, 0.0f, 1.0f}; // top left
-
-    // float texCoords[] = {
-    //     0.0f, 0.0f, // bottom left
-    //     1.0f, 0.0f, // bottom right
-    //     1.0f, 1.0f, // top right
-    //     0.0f, 1.0f  // top left
-    // };
 
     unsigned int squareIndices[] = {0, 1, 2, 0, 2, 3}; // two triangles; first triangle: 0, 1, 2; second triangle: 0, 2, 3;
                                                        // this is used for EBO, which is Element Buffer Object which means we can reuse vertices
@@ -123,10 +112,9 @@ int main()
     // VAO and VBO setup for square
     // VAO is like a container for VBO and attribute settings
     // VBO is where the actual vertex data is stored
-    glBindVertexArray(VAOs[1]);             // Bind the square VAO
-    glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]); // Bind the square VBO
-
-    glBufferData(GL_ARRAY_BUFFER, sizeof(squareVertices), squareVertices, GL_STATIC_DRAW); // Copy the square vertices into the VBO
+    glBindVertexArray(VAOs[1]);                                                            // Bind the VAO for the square
+    glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);                                                // Bind the VBO for the square
+    glBufferData(GL_ARRAY_BUFFER, sizeof(squareVertices), squareVertices, GL_STATIC_DRAW); // Copy vertex data to VBO
 
     // Position attribute of square
     glVertexAttribPointer(
@@ -139,7 +127,7 @@ int main()
     );
     glEnableVertexAttribArray(0);
 
-    // Color attribute of square
+    // Texture coordinate attribute of square
     glVertexAttribPointer(
         1,                          // layout(location = 1)
         2,                          // uv, so 2 components
