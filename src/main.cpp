@@ -97,13 +97,17 @@ int main()
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
+    // texture attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
     // Square (two triangles)
     float squareVertices[] = {
-        // positions        // texCoords (texture coordinates)
-        0.0f, -0.5f, 0.0f, 0.0f, 0.0f,  // bottom left
-        0.9f, -0.5f, 0.0f, 0.25f, 0.0f, // bottom right
-        0.9f, 0.5f, 0.0f, 0.25f, 0.25f, // top right
-        0.0f, 0.5f, 0.0f, 0.0f, 0.25f}; // top left
+        //  positions       colors      texCoords (texture coordinates)
+        0.0f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,  // bottom left
+        0.9f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.25f, 0.0f, // bottom right
+        0.9f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.25f, 0.25f, // top right
+        0.0f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.25f}; // top left
 
     unsigned int squareIndices[] = {0, 1, 2, 0, 2, 3}; // two triangles; first triangle: 0, 1, 2; second triangle: 0, 2, 3;
                                                        // this is used for EBO, which is Element Buffer Object which means we can reuse vertices
@@ -122,21 +126,31 @@ int main()
         3,                 // xyz, so 3 components
         GL_FLOAT,          // type, float
         GL_FALSE,          // normalized?
-        5 * sizeof(float), // STRIDE: 5 floats per vertex; 5 floats in a row in the array (3 for position, 2 for uv) represent a single vertex; u and v are texture coordinates
+        8 * sizeof(float), // STRIDE: 8 floats per vertex; 8 floats in a row in the array (3 for position, 2 for uv) represent a single vertex; u and v are texture coordinates
         (void *)0          // OFFSET: start at beginning
     );
     glEnableVertexAttribArray(0);
 
+    // color attribute (location = 1)
+    glVertexAttribPointer(
+        1,
+        3,
+        GL_FLOAT,
+        GL_FALSE,
+        8 * sizeof(float),
+        (void *)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
     // Texture coordinate attribute of square
     glVertexAttribPointer(
-        1,                          // layout(location = 1)
+        2,                          // layout(location = 1)
         2,                          // uv, so 2 components
         GL_FLOAT,                   // type
         GL_FALSE,                   // normalized?
-        5 * sizeof(float),          // STRIDE: 5 floats per vertex
-        (void *)(3 * sizeof(float)) // OFFSET: after the first 3 floats (in other words, skip position data)
+        8 * sizeof(float),          // STRIDE: 8 floats per vertex (3 for position, 3 for color, 2 for uv)
+        (void *)(6 * sizeof(float)) // OFFSET: after the first 6 floats (in other words, skip position and color data)
     );
-    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
 
     // EBO setup
     GLuint EBO;            // Element Buffer Object, which is used to store indices
@@ -158,6 +172,7 @@ int main()
 
     int width, height, nrChannels;
     unsigned char *data = stbi_load("../images/minecraft_textures.jpg", &width, &height, &nrChannels, 0);
+    stbi_set_flip_vertically_on_load(true); // Flip the image vertically on load
     if (!data)
     {
         std::cerr << "Failed to load texture" << std::endl;
