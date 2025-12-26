@@ -101,6 +101,7 @@ int main()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
+    // SQUARE SETUP
     // Square (two triangles)
     float squareVertices[] = {
         //  positions       colors      texCoords (texture coordinates)
@@ -112,7 +113,6 @@ int main()
     unsigned int squareIndices[] = {0, 1, 2, 0, 2, 3}; // two triangles; first triangle: 0, 1, 2; second triangle: 0, 2, 3;
                                                        // this is used for EBO, which is Element Buffer Object which means we can reuse vertices
 
-    // SQUARE SETUP
     // VAO and VBO setup for square
     // VAO is like a container for VBO and attribute settings
     // VBO is where the actual vertex data is stored
@@ -120,18 +120,18 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);                                                // Bind the VBO for the square
     glBufferData(GL_ARRAY_BUFFER, sizeof(squareVertices), squareVertices, GL_STATIC_DRAW); // Copy vertex data to VBO
 
-    // Position attribute of square
+    // Position attribute of square (location = 0)
     glVertexAttribPointer(
         0,                 // layout(location = 0)
         3,                 // xyz, so 3 components
         GL_FLOAT,          // type, float
         GL_FALSE,          // normalized?
-        8 * sizeof(float), // STRIDE: 8 floats per vertex; 8 floats in a row in the array (3 for position, 2 for uv) represent a single vertex; u and v are texture coordinates
+        8 * sizeof(float), // STRIDE: 8 floats per vertex; 8 floats in a row in the array (3 for position, 3 for color, 2 for uv) represent a single vertex; u and v are texture coordinates
         (void *)0          // OFFSET: start at beginning
     );
     glEnableVertexAttribArray(0);
 
-    // color attribute (location = 1)
+    // Color attribute of square (location = 1)
     glVertexAttribPointer(
         1,
         3,
@@ -141,9 +141,9 @@ int main()
         (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    // Texture coordinate attribute of square
+    // Texture coordinate attribute of square (location = 2)
     glVertexAttribPointer(
-        2,                          // layout(location = 1)
+        2,                          // layout(location = 2)
         2,                          // uv, so 2 components
         GL_FLOAT,                   // type
         GL_FALSE,                   // normalized?
@@ -171,8 +171,8 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     int width, height, nrChannels;
-    unsigned char *data = stbi_load("../images/minecraft_textures.jpg", &width, &height, &nrChannels, 0);
     stbi_set_flip_vertically_on_load(true); // Flip the image vertically on load
+    unsigned char *data = stbi_load("../images/minecraft_textures.jpg", &width, &height, &nrChannels, 0);
     if (!data)
     {
         std::cerr << "Failed to load texture" << std::endl;
