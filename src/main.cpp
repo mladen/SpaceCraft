@@ -71,9 +71,9 @@ int main()
         // Positions            Colors
         // x, y, z              r, g, b
         // (first three values) (last three values)
-        -0.9f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f,    // Red, bottom left
-        -0.0f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f,    // Green, bottom right
-        -0.45f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f}; // Blue, top
+        -0.9f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,    // Red, bottom left
+        -0.0f, 0.5f, 0.0f, 0.1f, 0.0f, 0.0f, 1.0f, 0.0f,    // Green, bottom right
+        -0.45f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f}; // Blue, top
 
     GLuint VAOs[2], VBOs[2];
     glGenVertexArrays(2, VAOs);
@@ -90,15 +90,15 @@ int main()
     glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
 
     // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
 
     // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
     // texture attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(6 * sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
     // SQUARE SETUP
